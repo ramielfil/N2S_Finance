@@ -78,6 +78,12 @@
     <Import Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="N2S_CalEcr.Designer.vb">
+      <DependentUpon>N2S_CalEcr.vb</DependentUpon>
+    </Compile>
+    <Compile Include="N2S_CalEcr.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="N2S_Rub.Designer.vb">
       <DependentUpon>N2S_Rub.vb</DependentUpon>
     </Compile>
@@ -97,6 +103,12 @@
     </Compile>
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="N2S_Global.vb" />
+    <Compile Include="N2S_JnlM.Designer.vb">
+      <DependentUpon>N2S_JnlM.vb</DependentUpon>
+    </Compile>
+    <Compile Include="N2S_JnlM.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <EmbeddedResource Include="Main.resx">
       <DependentUpon>Main.vb</DependentUpon>
     </EmbeddedResource>
@@ -111,8 +123,14 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="N2S_CalEcr.resx">
+      <DependentUpon>N2S_CalEcr.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="N2S_Rub.resx">
       <DependentUpon>N2S_Rub.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="N2S_JnlM.resx">
+      <DependentUpon>N2S_JnlM.vb</DependentUpon>
     </EmbeddedResource>
     <None Include="app.config" />
     <None Include="My Project\Settings.settings">

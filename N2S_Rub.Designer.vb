@@ -36,10 +36,13 @@ Partial Class N2S_Rub
         Me.BTN_V01 = New DevExpress.XtraEditors.SimpleButton()
         Me.BTN_V02 = New DevExpress.XtraEditors.SimpleButton()
         Me.BTN_V03 = New DevExpress.XtraEditors.SimpleButton()
+        Me.LabelControl2 = New DevExpress.XtraEditors.LabelControl()
+        Me.C_Code = New DevExpress.XtraEditors.TextEdit()
         CType(Me.GridRubriques, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.GridView1, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.C_Rub.Properties, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.C_Content.Properties, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.C_Code.Properties, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'TileBar1
@@ -100,14 +103,14 @@ Partial Class N2S_Rub
         '
         Me.C_Type.FormattingEnabled = True
         Me.C_Type.Items.AddRange(New Object() {""})
-        Me.C_Type.Location = New System.Drawing.Point(265, 16)
+        Me.C_Type.Location = New System.Drawing.Point(261, 16)
         Me.C_Type.Name = "C_Type"
-        Me.C_Type.Size = New System.Drawing.Size(121, 24)
+        Me.C_Type.Size = New System.Drawing.Size(180, 24)
         Me.C_Type.TabIndex = 19
         '
         'C_Content
         '
-        Me.C_Content.Location = New System.Drawing.Point(470, 18)
+        Me.C_Content.Location = New System.Drawing.Point(510, 18)
         Me.C_Content.Name = "C_Content"
         Me.C_Content.Size = New System.Drawing.Size(125, 22)
         Me.C_Content.TabIndex = 21
@@ -116,7 +119,7 @@ Partial Class N2S_Rub
         '
         Me.T_Contenu.Appearance.Font = New System.Drawing.Font("Arial", 7.8!, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.T_Contenu.Appearance.Options.UseFont = True
-        Me.T_Contenu.Location = New System.Drawing.Point(404, 20)
+        Me.T_Contenu.Location = New System.Drawing.Point(452, 20)
         Me.T_Contenu.Name = "T_Contenu"
         Me.T_Contenu.Size = New System.Drawing.Size(48, 16)
         Me.T_Contenu.TabIndex = 20
@@ -159,11 +162,30 @@ Partial Class N2S_Rub
         Me.BTN_V03.TabIndex = 25
         Me.BTN_V03.Text = "Supprimer"
         '
+        'LabelControl2
+        '
+        Me.LabelControl2.Appearance.Font = New System.Drawing.Font("Arial", 7.8!, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.LabelControl2.Appearance.Options.UseFont = True
+        Me.LabelControl2.Location = New System.Drawing.Point(12, 61)
+        Me.LabelControl2.Name = "LabelControl2"
+        Me.LabelControl2.Size = New System.Drawing.Size(30, 16)
+        Me.LabelControl2.TabIndex = 26
+        Me.LabelControl2.Text = "Code"
+        '
+        'C_Code
+        '
+        Me.C_Code.Location = New System.Drawing.Point(76, 61)
+        Me.C_Code.Name = "C_Code"
+        Me.C_Code.Size = New System.Drawing.Size(125, 22)
+        Me.C_Code.TabIndex = 27
+        '
         'N2S_Rub
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(800, 450)
+        Me.Controls.Add(Me.C_Code)
+        Me.Controls.Add(Me.LabelControl2)
         Me.Controls.Add(Me.BTN_V03)
         Me.Controls.Add(Me.BTN_V02)
         Me.Controls.Add(Me.BTN_V01)
@@ -182,6 +204,7 @@ Partial Class N2S_Rub
         CType(Me.GridView1, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.C_Rub.Properties, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.C_Content.Properties, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.C_Code.Properties, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -200,4 +223,6 @@ Partial Class N2S_Rub
     Friend WithEvents BTN_V01 As DevExpress.XtraEditors.SimpleButton
     Friend WithEvents BTN_V02 As DevExpress.XtraEditors.SimpleButton
     Friend WithEvents BTN_V03 As DevExpress.XtraEditors.SimpleButton
+    Friend WithEvents LabelControl2 As DevExpress.XtraEditors.LabelControl
+    Friend WithEvents C_Code As DevExpress.XtraEditors.TextEdit
 End Class

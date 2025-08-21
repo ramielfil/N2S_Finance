@@ -4,11 +4,13 @@ Imports DevExpress.XtraGrid.Views.Base
 
 ''' <summary>
 ''' Formulaire de gestion des rubriques N2S avec DevExpress GridControl
-''' Affiche RubriqueFormat sous forme de texte (Formule de calcul / Compte comptable)
-''' Permet d'ajouter, modifier et supprimer des rubriques.
+''' Gère les opérations CRUD (Create, Read, Update, Delete) sur la table N2S_Rubrique
 ''' </summary>
 Public Class N2S_Rub
 
+    ' ================================
+    ' VARIABLES GLOBALES
+    ' ================================
     Private selectedRubriqueID As Integer = 0 ' Id de la rubrique sélectionnée
 
     ' ================================
@@ -16,15 +18,15 @@ Public Class N2S_Rub
     ' ================================
     Private Sub N2S_Rub_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Try
-            ' Initialisation ComboBox
+            ' Initialisation ComboBox Type
             C_Type.Items.Clear()
             C_Type.Items.Add("Formule de calcul")
             C_Type.Items.Add("Compte comptable")
 
-            ' Charger les rubriques
+            ' Charger les rubriques depuis la base
             ChargerRubriques()
 
-            ' Configurer l'affichage texte pour la colonne RubriqueFormat
+            ' Gestion de l’affichage texte pour RubriqueFormat
             Dim view As GridView = CType(GridRubriques.MainView, GridView)
             AddHandler view.CustomColumnDisplayText, AddressOf GridView_CustomColumnDisplayText
 
@@ -36,16 +38,23 @@ Public Class N2S_Rub
     ' ================================
     ' UTILITAIRES
     ' ================================
+    ''' <summary>
+    ''' Vide tous les champs du formulaire
+    ''' </summary>
     Private Sub ViderChamps()
+        C_Code.Clear()
         C_Rub.Clear()
         C_Type.SelectedIndex = -1
         C_Content.Clear()
         selectedRubriqueID = 0
     End Sub
 
+    ''' <summary>
+    ''' Recharge les rubriques dans le GridControl
+    ''' </summary>
     Private Sub ChargerRubriques()
         Try
-            Dim query As String = "SELECT RubriqueID, RubriqueNom, RubriqueFormat, RubriqueContent FROM N2S_Rubrique"
+            Dim query As String = "SELECT RubriqueID, RubriqueCode, RubriqueNom, RubriqueFormat, RubriqueContent FROM N2S_Rubrique"
             F_CheckConnection()
 
             Using reader As SqlDataReader = F_GetDataReader(query)
@@ -54,15 +63,15 @@ Public Class N2S_Rub
                 GridRubriques.DataSource = dt
             End Using
 
-            ' ⚡ Récupérer le GridView principal
+            ' ⚡ Configuration GridView
             Dim view As GridView = CType(GridRubriques.MainView, GridView)
 
-            ' ⚡ Masquer la colonne RubriqueID
+            ' Masquer l’ID car inutile pour l’utilisateur
             If view.Columns.ColumnByFieldName("RubriqueID") IsNot Nothing Then
                 view.Columns("RubriqueID").Visible = False
             End If
 
-            ' ⚡ Rendre le GridView totalement non modifiable
+            ' Empêcher toute modification directe dans la grille
             view.OptionsBehavior.Editable = False
 
         Catch ex As Exception
@@ -70,7 +79,7 @@ Public Class N2S_Rub
         End Try
     End Sub
 
-
+    ' Conversion entre valeur numérique et texte pour RubriqueFormat
     Private Function MapperTypeEnValeur(typeText As String) As Integer
         Select Case typeText
             Case "Formule de calcul" : Return 1
@@ -88,31 +97,42 @@ Public Class N2S_Rub
     End Function
 
     ' ================================
-    ' BOUTONS
+    ' BOUTON AJOUTER
     ' ================================
     Private Sub BTN_V01_Click(sender As Object, e As EventArgs) Handles BTN_V01.Click
         Try
+            Dim code As String = C_Code.Text.Trim()
             Dim nom As String = C_Rub.Text.Trim()
             Dim typeText As String = If(C_Type.SelectedItem IsNot Nothing, C_Type.SelectedItem.ToString(), "")
             Dim contenu As String = C_Content.Text.Trim()
 
-            If String.IsNullOrEmpty(nom) OrElse String.IsNullOrEmpty(typeText) OrElse String.IsNullOrEmpty(contenu) Then
+            ' Vérifier les champs obligatoires
+            If String.IsNullOrEmpty(code) OrElse String.IsNullOrEmpty(nom) OrElse String.IsNullOrEmpty(typeText) OrElse String.IsNullOrEmpty(contenu) Then
                 MessageBox.Show("Veuillez remplir tous les champs.", "Champs manquants", MessageBoxButtons.OK, MessageBoxIcon.Warning)
                 Return
             End If
 
             Dim typeValue As Integer = MapperTypeEnValeur(typeText)
-            Dim query As String = $"INSERT INTO N2S_Rubrique (RubriqueNom, RubriqueFormat, RubriqueContent) VALUES ('{nom.Replace("'", "''")}', {typeValue}, '{contenu.Replace("'", "''")}')"
+
+            ' Requête d’insertion
+            Dim query As String =
+                $"INSERT INTO N2S_Rubrique (RubriqueCode, RubriqueNom, RubriqueFormat, RubriqueContent) " &
+                $"VALUES ('{code.Replace("'", "''")}', '{nom.Replace("'", "''")}', {typeValue}, '{contenu.Replace("'", "''")}')"
+
             F_ExecuteQuery(query)
 
             ChargerRubriques()
             ViderChamps()
             MessageBox.Show("Rubrique ajoutée avec succès.", "Succès", MessageBoxButtons.OK, MessageBoxIcon.Information)
+
         Catch ex As Exception
             MessageBox.Show("Erreur lors de l'insertion : " & ex.Message, "Erreur", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
     End Sub
 
+    ' ================================
+    ' BOUTON MODIFIER
+    ' ================================
     Private Sub BTN_V02_Click(sender As Object, e As EventArgs) Handles BTN_V02.Click
         Try
             If selectedRubriqueID = 0 Then
@@ -120,27 +140,41 @@ Public Class N2S_Rub
                 Return
             End If
 
+            Dim code As String = C_Code.Text.Trim()
             Dim nom As String = C_Rub.Text.Trim()
             Dim typeText As String = If(C_Type.SelectedItem IsNot Nothing, C_Type.SelectedItem.ToString(), "")
             Dim contenu As String = C_Content.Text.Trim()
 
-            If String.IsNullOrEmpty(nom) OrElse String.IsNullOrEmpty(typeText) OrElse String.IsNullOrEmpty(contenu) Then
+            If String.IsNullOrEmpty(code) OrElse String.IsNullOrEmpty(nom) OrElse String.IsNullOrEmpty(typeText) OrElse String.IsNullOrEmpty(contenu) Then
                 MessageBox.Show("Veuillez remplir tous les champs.", "Champs manquants", MessageBoxButtons.OK, MessageBoxIcon.Warning)
                 Return
             End If
 
             Dim typeValue As Integer = MapperTypeEnValeur(typeText)
-            Dim query As String = $"UPDATE N2S_Rubrique SET RubriqueNom='{nom.Replace("'", "''")}', RubriqueFormat={typeValue}, RubriqueContent='{contenu.Replace("'", "''")}' WHERE RubriqueID={selectedRubriqueID}"
+
+            ' Requête de mise à jour
+            Dim query As String =
+                $"UPDATE N2S_Rubrique " &
+                $"SET RubriqueCode='{code.Replace("'", "''")}', " &
+                $"RubriqueNom='{nom.Replace("'", "''")}', " &
+                $"RubriqueFormat={typeValue}, " &
+                $"RubriqueContent='{contenu.Replace("'", "''")}' " &
+                $"WHERE RubriqueID={selectedRubriqueID}"
+
             F_ExecuteQuery(query)
 
             ChargerRubriques()
             ViderChamps()
             MessageBox.Show("Rubrique modifiée avec succès.", "Succès", MessageBoxButtons.OK, MessageBoxIcon.Information)
+
         Catch ex As Exception
             MessageBox.Show("Erreur lors de la modification : " & ex.Message, "Erreur", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
     End Sub
 
+    ' ================================
+    ' BOUTON SUPPRIMER
+    ' ================================
     Private Sub BTN_V03_Click(sender As Object, e As EventArgs) Handles BTN_V03.Click
         Try
             Dim view As GridView = CType(GridRubriques.MainView, GridView)
@@ -153,6 +187,7 @@ Public Class N2S_Rub
                 Return
             End If
 
+            ' Confirmation
             Dim confirm As DialogResult = MessageBox.Show("Voulez-vous vraiment supprimer cette rubrique ?", "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question)
             If confirm = DialogResult.Yes Then
                 Dim query As String = $"DELETE FROM N2S_Rubrique WHERE RubriqueID={selectedRubriqueID}"
@@ -161,6 +196,7 @@ Public Class N2S_Rub
                 ViderChamps()
                 MessageBox.Show("Rubrique supprimée avec succès.", "Succès", MessageBoxButtons.OK, MessageBoxIcon.Information)
             End If
+
         Catch ex As Exception
             MessageBox.Show("Erreur lors de la suppression : " & ex.Message, "Erreur", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
@@ -174,7 +210,9 @@ Public Class N2S_Rub
             Dim view As GridView = CType(sender, GridView)
             Dim rowHandle As Integer = view.FocusedRowHandle
             If rowHandle >= 0 Then
+                ' ⚡ Remplir les champs du formulaire à partir de la ligne sélectionnée
                 selectedRubriqueID = Convert.ToInt32(view.GetRowCellValue(rowHandle, "RubriqueID"))
+                C_Code.Text = view.GetRowCellValue(rowHandle, "RubriqueCode").ToString()
                 C_Rub.Text = view.GetRowCellValue(rowHandle, "RubriqueNom").ToString()
                 C_Type.SelectedItem = MapperValeurEnType(Convert.ToInt32(view.GetRowCellValue(rowHandle, "RubriqueFormat")))
                 C_Content.Text = view.GetRowCellValue(rowHandle, "RubriqueContent").ToString()
@@ -184,7 +222,7 @@ Public Class N2S_Rub
         End Try
     End Sub
 
-    ' Convertir RubriqueFormat de chiffre en texte pour affichage
+    ' Gestion de l’affichage texte pour RubriqueFormat
     Private Sub GridView_CustomColumnDisplayText(sender As Object, e As CustomColumnDisplayTextEventArgs)
         If e.Column.FieldName = "RubriqueFormat" Then
             e.DisplayText = MapperValeurEnType(Convert.ToInt32(e.Value))
